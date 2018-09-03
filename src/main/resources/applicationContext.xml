@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="emailJobReminderCronTrigger" />
+            </list>
+        </property>
+    </bean>
+    <bean id="emailJobReminderCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="emailJobReminder" />
+        <property name="cronExpression" value="0 * * * * ?" />
+    </bean>
+
+    <bean name="emailJobReminder" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.example.mail.reminders.EmailJobReminder" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="emailService" value-ref="emailService"></entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="emailService" class="com.example.mail.service.EmailServiceImpl">
+        <property name="javaMailSender" ref="javaMailSender"></property>
+    </bean>
+
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="host" value="smtp.gmail.com" />
+        <property name="port" value="465" />
+        <property name="protocol" value="smtps" />
+        <property name="username" value="gegetest366@gmail.com"/>
+        <property name="password" value="yourPassword"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtps.auth">true</prop>
+                <prop key="mail.smtps.starttls.enable">true</prop>
+                <prop key="mail.smtps.debug">true</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>
